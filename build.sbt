@@ -1,4 +1,5 @@
-ThisBuild / version      := "0.1.0-SNAPSHOT"
+enablePlugins(GitVersioning, GitBranchPrompt)
+
 ThisBuild / scalaVersion := "3.0.2"
 ThisBuild / organization := "io.darkgoat"
 
