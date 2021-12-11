@@ -12,7 +12,13 @@ ThisBuild / credentials += Credentials(
   userName = artifactoryUsername,
   passwd = artifactoryPassword)
 
-lazy val root = (project in file("."))
+lazy val fs = (project in file("modules/fs"))
+  .settings(
+    name := "alabama-fs"
+  )
+
+lazy val alabama = (project in file("."))
+  .aggregate(fs)
   .settings(
     name := "alabama"
   )
