@@ -5,12 +5,9 @@ ThisBuild / organization := "io.darkgoat"
 
 lazy val artifactoryUsername = sys.env("DARKGOAT_ARTIFACTORY_USERNAME")
 lazy val artifactoryPassword = sys.env("DARKGOAT_ARTIFACTORY_PASSWORD")
-lazy val timestamp           = new java.util.Date().getTime
+lazy val artifactoryUrl      = "https://darkgoat.jfrog.io/artifactory/darkgoat-release"
 
-ThisBuild / publishTo := Some(
-  "Artifactory Realm".at("https://darkgoat.jfrog.io/artifactory/darkgoat-devel;build.timestamp=$timestamp")
-)
-
+ThisBuild / publishTo := Some("Artifactory Realm".at(artifactoryUrl))
 ThisBuild / credentials += Credentials(
   realm = "Artifactory Realm",
   host = "darkgoat.jfrog.io",
