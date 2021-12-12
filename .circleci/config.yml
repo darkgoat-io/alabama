@@ -1,0 +1,71 @@
+version: 2.1
+
+executors:
+  openjdk:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/repo
+
+########################
+# yaml anchors (cache) #
+########################
+cache-restore-src: &cache-restore-src
+  name: Restoring Cache (src)
+  keys:
+    - v1-src-{{ .Branch }}-{{ .Revision }}
+    - v1-src-{{ .Branch }}-
+    - v1-src-
+
+cache-restore-deps: &cache-restore-deps
+  name: Restoring Cache (deps)
+  keys:
+    - v1-deps-{{ checksum "build.sbt" }}
+    - v1-deps-
+
+cache-save-src: &cache-save-src
+  name: Saving Cache (src)
+  key: v1-src-{{ .Branch }}-{{ .Revision }}
+  paths:
+    - .git
+
+cache-save-deps: &cache-save-deps
+  name: Saving Cache (deps)
+  key: v1-deps-{{ checksum "build.sbt" }}
+  paths:
+    - ~/.cache/coursier
+    - ~/.ivy2/cache
+    - ~/.sbt
+    - ~/.m2
+
+########
+# jobs #
+########
+jobs:
+  cache-warmup:
+    executor: openjdk
+    steps:
+      - restore_cache: *cache-restore-src
+      - checkout
+      - restore_cache: *cache-restore-deps
+      - run: sbt update
+      - run: sbt test:update
+      - save_cache: *cache-save-src
+      - save_cache: *cache-save-deps
+
+
+##################
+# filter anchors #
+##################
+filter-main: &filter-main
+  branches:
+    only: main
+
+#############
+# workflows #
+#############
+workflows:
+  version: 2
+  main:
+    jobs:
+      - cache-warmup:
+          filters: *filter-main
