@@ -3,17 +3,17 @@ enablePlugins(GitVersioning, GitBranchPrompt)
 ThisBuild / scalaVersion := "3.0.2"
 ThisBuild / organization := "io.darkgoat"
 
-lazy val artifactoryUsername = sys.env("DARKGOAT_ARTIFACTORY_USERNAME")
-lazy val artifactoryPassword = sys.env("DARKGOAT_ARTIFACTORY_PASSWORD")
-lazy val artifactoryUrl      = "https://darkgoat.jfrog.io/artifactory/darkgoat-release"
-
+lazy val artifactoryUrl = "https://darkgoat.jfrog.io/artifactory/darkgoat-release"
 ThisBuild / publishTo := Some("Artifactory Realm".at(artifactoryUrl))
-ThisBuild / credentials += Credentials(
+ThisBuild / credentials ++= (for {
+  userName <- sys.env.get("DARKGOAT_ARTIFACTORY_USERNAME")
+  passwd   <- sys.env.get("DARKGOAT_ARTIFACTORY_PASSWORD")
+} yield Credentials(
   realm = "Artifactory Realm",
   host = "darkgoat.jfrog.io",
-  userName = artifactoryUsername,
-  passwd = artifactoryPassword
-)
+  userName = userName,
+  passwd = passwd
+)).toSeq
 
 lazy val fs = (project in file("modules/fs"))
   .settings(
