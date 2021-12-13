@@ -77,11 +77,18 @@ filter-main: &filter-main
   branches:
     only: main
 
+filter-release: &filter-release
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v\d+.\d+.\d+$/
+
 #############
 # workflows #
 #############
 workflows:
   version: 2
+
   main:
     jobs:
       - cache-warmup:
@@ -92,5 +99,18 @@ workflows:
             - cache-warmup
       - sbt-publish:
           filters: *filter-main
+          requires:
+            - sbt-test
+
+  release:
+    jobs:
+      - cache-warmup:
+          filters: *filter-release
+      - sbt-test:
+          filters: *filter-release
+          requires:
+            - cache-warmup
+      - sbt-publish:
+          filters: *filter-release
           requires:
             - sbt-test
