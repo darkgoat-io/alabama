@@ -41,6 +41,7 @@ cache-save-deps: &cache-save-deps
 # jobs #
 ########
 jobs:
+
   cache-warmup:
     executor: openjdk
     steps:
@@ -52,10 +53,18 @@ jobs:
       - save_cache: *cache-save-src
       - save_cache: *cache-save-deps
 
+  sbt-test:
+    executor: openjdk
+    steps:
+      - restore_cache: *cache-restore-src
+      - checkout
+      - restore_cache: *cache-restore-deps
+      - run: sbt scalafmtSbtCheck
+      - run: sbt scalafmtCheckAll
 
-##################
-# filter anchors #
-##################
+#########################
+# yaml anchors (filter) #
+#########################
 filter-main: &filter-main
   branches:
     only: main
@@ -69,3 +78,7 @@ workflows:
     jobs:
       - cache-warmup:
           filters: *filter-main
+      - sbt-test:
+          filters: *filter-main
+          requires:
+            - cache-warmup
