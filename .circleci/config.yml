@@ -101,6 +101,7 @@ workflows:
           filters: *filter-main
           requires:
             - sbt-test
+          context: alabama-snapshot
 
   release:
     jobs:
@@ -114,3 +115,4 @@ workflows:
           filters: *filter-release
           requires:
             - sbt-test
+          context: alabama-release
