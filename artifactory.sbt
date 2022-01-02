@@ -1,7 +1,8 @@
-ThisBuild / publishTo :=
-  sys.env
-    .get("ALABAMA_ARTIFACTORY_URL")
-    .map(artifactoryUrl => "Artifactory Realm".at(artifactoryUrl))
+ThisBuild / publishTo := {
+  val repo = "https://darkgoat.jfrog.io/artifactory"
+  if (isSnapshot.value) Some("Artifactory Realm".at(s"$repo/snapshots"))
+  else Some("Artifactory Realm".at(s"$repo/releases"))
+}
 
 ThisBuild / credentials ++=
   (for {
